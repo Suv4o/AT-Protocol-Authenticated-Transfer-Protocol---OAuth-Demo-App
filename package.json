@@ -1,0 +1,27 @@
+{
+  "name": "at-protocol",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx --env-file=.env src/index.ts",
+    "dev": "tsx watch --env-file=.env src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@atproto/api": "^0.18.20",
+    "@atproto/oauth-client-node": "^0.3.16",
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1",
+    "iron-session": "^8.0.4",
+    "kysely": "^0.28.11"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^5.0.6",
+    "tsx": "^4.21.0"
+  }
+}
