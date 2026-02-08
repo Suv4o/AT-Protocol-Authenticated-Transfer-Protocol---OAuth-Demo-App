@@ -1,8 +1,11 @@
 import { Agent } from "@atproto/api";
+import { TID } from "@atproto/common-web";
 import express from "express";
 import { getIronSession } from "iron-session";
 import { createDb, migrateToLatest } from "./db.js";
 import { createOAuthClient } from "./auth.js";
+
+const RECIPE_COLLECTION = "com.myrecipes.recipe";
 
 type Session = { did?: string };
 
@@ -129,6 +132,89 @@ async function main() {
     res.redirect("/");
   });
 
+  // --- Custom record (recipe) routes ---
+
+  app.post("/recipe", async (req, res) => {
+    const agent = await getSessionAgent(req, res);
+    if (!agent) {
+      res.redirect("/login");
+      return;
+    }
+    const { title, ingredients, steps } = req.body;
+    if (!title || !ingredients || !steps) {
+      res.status(400).send("Title, ingredients, and steps are required");
+      return;
+    }
+    await agent.com.atproto.repo.putRecord({
+      repo: agent.assertDid,
+      collection: RECIPE_COLLECTION,
+      rkey: TID.nextStr(),
+      record: {
+        $type: RECIPE_COLLECTION,
+        title,
+        ingredients: ingredients.split("\n").filter((line: string) => line.trim()),
+        steps: steps.split("\n").filter((line: string) => line.trim()),
+        createdAt: new Date().toISOString(),
+      },
+    });
+    res.redirect("/recipes");
+  });
+
+  app.get("/recipes", async (req, res) => {
+    const agent = await getSessionAgent(req, res);
+    if (!agent) {
+      res.redirect("/login");
+      return;
+    }
+    const { data } = await agent.com.atproto.repo.listRecords({
+      repo: agent.assertDid,
+      collection: RECIPE_COLLECTION,
+      limit: 20,
+    });
+
+    const recipesHtml = data.records.length
+      ? data.records
+          .map((record) => {
+            const r = record.value as {
+              title?: string;
+              ingredients?: string[];
+              steps?: string[];
+              createdAt?: string;
+            };
+            const ingredientsList = (r.ingredients || [])
+              .map((i) => `<li>${i}</li>`)
+              .join("");
+            const stepsList = (r.steps || [])
+              .map((s, idx) => `<li>${s}</li>`)
+              .join("");
+            return `
+              <div style="border:1px solid #ccc; padding:12px; margin-bottom:12px;">
+                <h3>${r.title}</h3>
+                <p><em>${r.createdAt}</em></p>
+                <strong>Ingredients:</strong>
+                <ul>${ingredientsList}</ul>
+                <strong>Steps:</strong>
+                <ol>${stepsList}</ol>
+              </div>
+            `;
+          })
+          .join("")
+      : "<p>No recipes yet. Go add one!</p>";
+
+    res.send(`
+      <html>
+      <head><title>My Recipes — AT Protocol App</title></head>
+      <body>
+        <h1>Your Recipes</h1>
+        ${recipesHtml}
+        <p><a href="/">Back to home</a></p>
+      </body>
+      </html>
+    `);
+  });
+
+  // --- Home page ---
+
   app.get("/", async (req, res) => {
     const agent = await getSessionAgent(req, res);
 
@@ -182,6 +268,25 @@ async function main() {
 
         <h2>Your Recent Posts</h2>
         <ul>${postsHtml}</ul>
+
+        <hr/>
+
+        <h2>Save a Recipe (Custom Record)</h2>
+        <form action="/recipe" method="post">
+          <label>Title:</label><br/>
+          <input type="text" name="title" placeholder="e.g. Banana Bread" required style="width:300px;"/>
+          <br/><br/>
+          <label>Ingredients (one per line):</label><br/>
+          <textarea name="ingredients" rows="4" cols="50" placeholder="3 bananas&#10;1 cup sugar&#10;2 cups flour" required></textarea>
+          <br/><br/>
+          <label>Steps (one per line):</label><br/>
+          <textarea name="steps" rows="4" cols="50" placeholder="Mash bananas&#10;Mix ingredients&#10;Bake at 180C for 50 min" required></textarea>
+          <br/><br/>
+          <button type="submit">Save Recipe</button>
+        </form>
+        <p><a href="/recipes">View your recipes</a></p>
+
+        <hr/>
 
         <form action="/logout" method="post">
           <button type="submit">Logout</button>

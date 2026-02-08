@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "com.myrecipes.recipe",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["title", "ingredients", "steps", "createdAt"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 200 },
+          "ingredients": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "steps": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}
