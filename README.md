@@ -1,5 +1,9 @@
 # AT Protocol (Authenticated Transfer Protocol) - OAuth Demo App
 
+![The Protocol Behind Bluesky: Rethinking Social Media Architecture](https://res.cloudinary.com/suv4o/image/upload/q_auto,f_auto,w_750,e_sharpen:100/v1770893361/blog/the-protocol-behind-bluesky-rethinking-social-media-architecture/the-protocol-behind-bluesky-rethinking-social-media-architecture-2_bqif19)
+
+This project is part of the blog article [The Protocol Behind Bluesky: Rethinking Social Media Architecture](https://www.trpkovski.com/2026/02/15/the-protocol-behind-bluesky-rethinking-social-media-architecture). Please have a look at the article for more details on how this app works and the concepts behind the AT Protocol.
+
 A simple Node.js/TypeScript web app that authenticates users via AT Protocol OAuth and lets them view their profile, create posts on Bluesky, and save custom records (recipes) to their Personal Data Server.
 
 ## Prerequisites
@@ -82,18 +86,18 @@ Go to [http://localhost:3000](http://localhost:3000).
 
 ### Routes
 
-| Method | Path                          | Description                                   |
-| ------ | ----------------------------- | --------------------------------------------- |
-| `GET`  | `/`                           | Home page (login link or profile + post form) |
-| `GET`  | `/login`                      | Login page with handle input                  |
-| `POST` | `/login`                      | Initiates OAuth flow                          |
-| `GET`  | `/oauth/callback`             | OAuth callback — completes authentication     |
-| `POST` | `/post`                       | Creates a new Bluesky post                    |
+| Method | Path                          | Description                                    |
+| ------ | ----------------------------- | ---------------------------------------------- |
+| `GET`  | `/`                           | Home page (login link or profile + post form)  |
+| `GET`  | `/login`                      | Login page with handle input                   |
+| `POST` | `/login`                      | Initiates OAuth flow                           |
+| `GET`  | `/oauth/callback`             | OAuth callback — completes authentication      |
+| `POST` | `/post`                       | Creates a new Bluesky post                     |
 | `POST` | `/recipe`                     | Saves a custom recipe record to the user's PDS |
-| `GET`  | `/recipes`                    | Lists all recipe records from the user's PDS  |
-| `POST` | `/logout`                     | Destroys session and redirects to home        |
-| `GET`  | `/oauth-client-metadata.json` | Serves OAuth client metadata                  |
-| `GET`  | `/.well-known/jwks.json`      | Serves JWKS (empty in loopback mode)          |
+| `GET`  | `/recipes`                    | Lists all recipe records from the user's PDS   |
+| `POST` | `/logout`                     | Destroys session and redirects to home         |
+| `GET`  | `/oauth-client-metadata.json` | Serves OAuth client metadata                   |
+| `GET`  | `/.well-known/jwks.json`      | Serves JWKS (empty in loopback mode)           |
 
 ## Key Technologies
 
